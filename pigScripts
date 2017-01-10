@@ -1,0 +1,132 @@
+1)
+
+grunt> EMP =  LOAD '/home/acadgild/Onkar/Session07/employee_details.txt' USING PigStorage(',') AS (emp_id:int, name:chararray,salary:int,rating:int);
+
+grunt> DUMP EMP;
+
+grunt> 
+(101,Amitabh,20000,1)
+(102,Shahrukh,10000,2)
+(103,Akshay,11000,3)
+(104,Anubhav,5000,4)
+(105,Pawan,2500,5)
+(106,Aamir,25000,1)
+(107,Salman,17500,2)
+(108,Ranbir,14000,3)
+(109,Katrina,1000,4)
+(110,Priyanka,2000,5)
+(111,Tushar,500,1)
+(112,Ajay,5000,2)
+(113,Jubeen,1000,1)
+(114,Madhuri,2000,2)
+
+grunt> 
+
+
+grunt> TOP = ORDER EMP BY rating DESC;
+
+grunt> DUMP TOP;
+
+(105,Pawan,2500,5)
+(110,Priyanka,2000,5)
+(104,Anubhav,5000,4)
+(109,Katrina,1000,4)
+(108,Ranbir,14000,3)
+(103,Akshay,11000,3)
+(114,Madhuri,2000,2)
+(112,Ajay,5000,2)
+(107,Salman,17500,2)
+(102,Shahrukh,10000,2)
+(111,Tushar,500,1)
+(113,Jubeen,1000,1)
+(101,Amitabh,20000,1)
+(106,Aamir,25000,1)
+
+grunt> 
+
+grunt> TOP5 = LIMIT TOP 5;
+
+grunt> DUMP TOP5;
+
+(110,Priyanka,2000,5)
+(105,Pawan,2500,5)
+(109,Katrina,1000,4)
+(104,Anubhav,5000,4)
+(108,Ranbir,14000,3)
+
+grunt> 
+
+grunt> TOP_EMP = foreach TOP5 generate emp_id,name;
+
+grunt> DUMP TOP_EMP;
+
+
+2)
+
+grunt> TOP_SAL = ORDER EMP BY salary DESC;
+
+grunt> DUMP TOP_SAL;
+
+grunt> grunt> TOP_ODD_SAL = FILTER TOP_SAL BY emp_id%2==1;
+grunt> DUMP TOP_ODD_SAL;
+
+grunt> TOP3_ODD_SAL = LIMIT TOP_ODD_SAL 3;
+grunt> DUMP TOP3_ODD_SAL;
+grunt>
+(101,Amitabh,20000,1)
+(107,Salman,17500,2)
+(103,Akshay,11000,3)
+
+grunt> 
+
+
+
+3)
+
+
+grunt> EMP_EXPENSE = LOAD '/home/acadgild/Onkar/Session07/employee_expenses.txt' USING PigStorage('\t') AS (id:int,emp_exp:int);
+
+grunt> DUMP EMP_EXPENSE;
+grunt> GRP_EXP = GROUP EMP_EXPENSE BY id;
+grunt> DUMP GRP_EXP;
+
+grunt> T = FOREACH GRP_EXP GENERATE group AS id, EMP_EXPENSE.id as E_EID,SUM(EMP_EXPENSE.emp_exp) as expense;
+
+grunt> F = FOREACH T GENERATE $0,$2;
+
+grunt> EMP_JOIN =  JOIN EMP BY emp_id, F BY id;
+
+DUMP EMP_JOIN;
+
+grunt> MAX_EXP = ORDER EMP_JOIN BY expense DESC;
+
+grunt> MX_EMP = FOREACH MAX_EXP GENERATE $0 as EMP_ID,$1 AS EMP_NAME,$5 AS EXP
+
+grunt> TOP_EXP_EMP = LIMIT MX_EMP 1;
+
+grunt> DUMP TOP_EXP_EMP;
+
+
+4]
+
+grunt> EMP_EXPENSE = LOAD '/home/acadgild/Onkar/Session07/employee_expenses.txt' USING PigStorage('\t') AS (id:int,emp_exp:int);
+
+grunt> DUMP EMP_EXPENSE;
+grunt> GRP_EXP = GROUP EMP_EXPENSE BY id;
+grunt> DUMP GRP_EXP;
+
+
+grunt> T = FOREACH GRP_EXP GENERATE group AS id, EMP_EXPENSE.id as E_EID,SUM(EMP_EXPENSE.emp_exp) as expense;
+
+grunt> F = FOREACH T GENERATE $0,$2;
+
+grunt> EMP_JOIN =  JOIN EMP BY emp_id, F BY id;
+
+grunt> DUMP EMP_JOIN;
+
+5]
+
+grunt> EMP_JOIN_LEFT =  JOIN EMP BY emp_id LEFT OUTER, F BY id;
+
+grunt> DUMP EMP_JOIN_LEFT;
+
